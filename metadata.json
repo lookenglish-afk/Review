@@ -1,0 +1,6 @@
+{
+  "name": "Unit 1: Computers Today - Đấu Trường Trắc Nghiệm Tin Học",
+  "description": "Ứng dụng web ôn tập trắc nghiệm Tiếng Anh Tin học Unit 1: Computers Today dành cho sinh viên với đăng nhập thông tin, lưu trữ điểm số vào localStorage, bảng xếp hạng và huy hiệu thành tích.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,903 @@
+// Standalone single-file HTML generator containing full HTML, Tailwind CSS, Web Audio, and Vanilla JS
+export function generateSingleFileHtml(): string {
+  return `<!DOCTYPE html>
+<html lang="vi" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UNIT 1: COMPUTERS TODAY - Đấu Trường Trắc Nghiệm Tin Học</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+  </style>
+</head>
+<body class="min-h-full flex flex-col bg-slate-950 text-slate-100 antialiased selection:bg-cyan-500 selection:text-white">
+
+  <!-- Header Navigation -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-30 px-4 py-3">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2.5 cursor-pointer" onclick="showScreen('login')">
+        <div class="w-8 h-8 rounded-lg bg-cyan-500/20 border border-cyan-500/40 text-cyan-400 flex items-center justify-center font-bold text-sm">
+          ⚡
+        </div>
+        <div>
+          <div class="font-extrabold text-sm sm:text-base text-white tracking-tight">UNIT 1: COMPUTERS TODAY</div>
+          <div class="text-[10px] text-slate-400">Tiếng Anh Chuyên Ngành Tin Học</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="soundToggleBtn" onclick="toggleSound()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs border border-slate-700 transition" title="Bật/Tắt âm thanh">
+          🔊
+        </button>
+        <button onclick="showScreen('leaderboard')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5">
+          🏆 <span>Bảng Xếp Hạng</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6">
+    
+    <!-- 1. LOGIN / STUDENT INFO SCREEN -->
+    <section id="loginScreen" class="max-w-2xl mx-auto py-6">
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 text-xs font-medium mb-3">
+          💻 Ôn tập kiến thức phần cứng & từ vựng chuyên ngành
+        </div>
+        <h1 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+          Đăng Nhập Thông Tin Sinh Viên
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-2">
+          Điền đầy đủ thông tin để ghi nhận kết quả và lưu vào bộ nhớ localStorage không lo mất điểm!
+        </p>
+      </div>
+
+      <!-- Resume banner if existing progress -->
+      <div id="resumeBox" class="hidden mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+          <div class="font-bold text-sm text-white">Bạn có bài làm dở chưa hoàn thành!</div>
+          <div id="resumeText" class="text-xs text-amber-300 mt-0.5"></div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="resumeQuiz()" class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-lg transition">Tiếp Tục</button>
+          <button onclick="discardProgress()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg border border-slate-700 transition">Hủy</button>
+        </div>
+      </div>
+
+      <!-- Form Box -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-md">
+        <form onsubmit="handleStartQuiz(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+              Họ và Tên <span class="text-rose-400">*</span>
+            </label>
+            <input id="inputFullName" type="text" required placeholder="Ví dụ: Nguyễn Văn An" class="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-cyan-500 transition">
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                Lớp Sinh Hoạt <span class="text-rose-400">*</span>
+              </label>
+              <input id="inputClass" type="text" required placeholder="Ví dụ: CNTT K18A" class="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-cyan-500 transition">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                Mã Số Sinh Viên (MSSV) <span class="text-rose-400">*</span>
+              </label>
+              <input id="inputId" type="text" required placeholder="Ví dụ: 2021600123" class="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm uppercase font-mono focus:outline-none focus:border-cyan-500 transition">
+            </div>
+          </div>
+
+          <div id="loginError" class="hidden text-xs text-rose-400 font-semibold p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/30"></div>
+
+          <div class="pt-3">
+            <button type="submit" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-base shadow-lg shadow-cyan-500/20 transition flex items-center justify-center gap-2">
+              <span>Bắt Đầu Ôn Tập (10 Câu)</span>
+              <span>→</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- 2. QUIZ SCREEN -->
+    <section id="quizScreen" class="hidden max-w-3xl mx-auto py-4">
+      <!-- Status Strip -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 mb-4 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="quizStudentName" class="font-bold text-white"></span>
+          <span id="quizStudentInfo" class="text-slate-400 font-mono"></span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div id="streakBox" class="hidden text-amber-400 font-bold flex items-center gap-1">
+            🔥 <span id="streakCount">0</span> chuỗi
+          </div>
+          <div class="px-2.5 py-1 rounded bg-slate-950 border border-slate-800 font-mono text-cyan-300">
+            ⏱ <span id="timerText">00:00</span>
+          </div>
+          <div class="px-2.5 py-1 rounded bg-slate-950 border border-slate-800 text-slate-300">
+            Điểm: <span id="liveScore" class="font-bold text-emerald-400">0</span>/10
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="mb-4">
+        <div class="flex justify-between text-xs text-slate-400 mb-1.5 font-medium">
+          <span>Câu <strong id="currentQuestionNum" class="text-white">1</strong> / 10</span>
+          <span id="progressPercent" class="font-mono text-cyan-400">10%</span>
+        </div>
+        <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+          <div id="progressBarFill" class="h-full bg-cyan-500 transition-all duration-300" style="width: 10%;"></div>
+        </div>
+      </div>
+
+      <!-- Question Card -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl mb-4">
+        <div class="flex items-center justify-between gap-2 mb-3">
+          <span id="questionCategory" class="px-3 py-1 rounded-full text-xs font-semibold bg-cyan-950 border border-cyan-500/30 text-cyan-300">
+            CPU & Processing
+          </span>
+          <button onclick="toggleTranslation()" class="text-xs text-slate-400 hover:text-cyan-300 transition">
+            🌐 <span id="transBtnText">Dịch nghĩa</span>
+          </button>
+        </div>
+
+        <h2 id="questionText" class="text-lg sm:text-2xl font-bold text-white leading-relaxed mb-2"></h2>
+        
+        <div id="translationBox" class="hidden mb-4 p-3 rounded-lg bg-slate-950 border border-slate-800 text-xs sm:text-sm text-cyan-200 italic"></div>
+
+        <!-- 4 Options -->
+        <div id="optionsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4"></div>
+
+        <!-- Feedback & Explanation Box -->
+        <div id="feedbackBox" class="hidden mt-6 p-4 rounded-xl border text-xs sm:text-sm"></div>
+      </div>
+
+      <!-- Next Button -->
+      <div class="flex items-center justify-end">
+        <button id="nextBtn" onclick="handleNextQuestion()" class="hidden py-3 px-6 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 text-slate-950 font-bold text-sm transition">
+          Câu Tiếp Theo →
+        </button>
+      </div>
+    </section>
+
+    <!-- 3. RESULT SCREEN -->
+    <section id="resultScreen" class="hidden max-w-3xl mx-auto py-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl text-center mb-6">
+        <div class="text-5xl mb-2">🏆</div>
+        <h1 class="text-2xl sm:text-4xl font-black text-white tracking-tight">KẾT QUẢ ÔN TẬP UNIT 1</h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">Computers Today - Tiếng Anh Chuyên Ngành Tin Học</p>
+
+        <!-- Student bar -->
+        <div class="my-5 p-3 rounded-xl bg-slate-950 border border-slate-800 flex flex-wrap justify-around gap-2 text-xs sm:text-sm">
+          <div>Sinh viên: <strong id="resFullName" class="text-white"></strong></div>
+          <div>Lớp: <strong id="resClass" class="text-cyan-300"></strong></div>
+          <div>MSSV: <strong id="resId" class="text-white font-mono"></strong></div>
+          <div>Thời gian: <strong id="resTime" class="text-slate-300"></strong></div>
+        </div>
+
+        <!-- Big Score Boxes -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6">
+          <div class="p-4 rounded-xl bg-slate-950 border border-slate-800">
+            <div class="text-xs text-slate-400 uppercase font-semibold">Điểm Số (Thang 10)</div>
+            <div id="resScore" class="text-4xl sm:text-5xl font-black text-cyan-400 my-1">10.0</div>
+            <div id="resCount" class="text-xs text-slate-400">Đúng 10/10 câu (100%)</div>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-950 border border-slate-800">
+            <div class="text-xs text-slate-400 uppercase font-semibold">Xếp Loại</div>
+            <div id="resRank" class="text-2xl sm:text-3xl font-black text-emerald-400 my-1">Xuất Sắc</div>
+            <div id="resRankDesc" class="text-xs text-slate-300">Hoàn thành xuất sắc</div>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-950 border border-slate-800">
+            <div class="text-xs text-slate-400 uppercase font-semibold">Huy Hiệu Đạt Được</div>
+            <div id="resBadges" class="flex flex-wrap gap-1.5 justify-center mt-2"></div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-wrap items-center justify-center gap-3 pt-4 border-t border-slate-800">
+          <button onclick="startNewQuiz()" class="py-2.5 px-5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs rounded-xl transition">Làm Lại Bài</button>
+          <button onclick="showScreen('leaderboard')" class="py-2.5 px-5 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs rounded-xl border border-slate-700 transition">Xem Bảng Xếp Hạng</button>
+          <button onclick="window.print()" class="py-2.5 px-4 bg-slate-950 hover:bg-slate-800 text-slate-300 text-xs rounded-xl border border-slate-800 transition">In Phiếu Điểm</button>
+          <button onclick="showScreen('login')" class="py-2.5 px-4 bg-slate-950 hover:bg-slate-800 text-slate-400 text-xs rounded-xl border border-slate-800 transition">Đổi Sinh Viên</button>
+        </div>
+      </div>
+
+      <!-- Detailed Review Accordion -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <h3 class="text-base font-bold text-white mb-4">Chi Tiết Lời Giải Từng Câu Hỏi:</h3>
+        <div id="reviewList" class="space-y-4"></div>
+      </div>
+    </section>
+
+    <!-- 4. LEADERBOARD SCREEN -->
+    <section id="leaderboardScreen" class="hidden max-w-4xl mx-auto py-4">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
+        <div>
+          <button onclick="showScreen('login')" class="text-xs text-slate-400 hover:text-white transition mb-1">← Quay lại trang chủ</button>
+          <h1 class="text-2xl font-black text-white flex items-center gap-2">🏆 Bảng Vàng & Lịch Sử Kết Quả</h1>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="exportCSV()" class="py-2 px-3.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg transition">Xuất File CSV</button>
+          <button onclick="startNewQuiz()" class="py-2 px-3.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold rounded-lg transition">Làm Bài Mới</button>
+        </div>
+      </div>
+
+      <!-- Search & Filter -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 mb-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <input id="searchLeaderboard" oninput="renderLeaderboard()" type="text" placeholder="Tìm kiếm theo Tên, Lớp, MSSV..." class="w-full sm:w-64 px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500">
+        <div class="flex items-center gap-2 text-xs text-slate-400">
+          <span>Sắp xếp:</span>
+          <select id="sortLeaderboard" onchange="renderLeaderboard()" class="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-white text-xs">
+            <option value="score">Điểm cao nhất</option>
+            <option value="time">Thời gian nhanh nhất</option>
+            <option value="date">Gần đây nhất</option>
+          </select>
+          <button onclick="clearAllData()" class="text-slate-500 hover:text-rose-400 p-1" title="Xóa toàn bộ">🗑</button>
+        </div>
+      </div>
+
+      <!-- Table Container -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-950 text-slate-400 uppercase text-[10px] border-b border-slate-800">
+              <tr>
+                <th class="py-3 px-3 text-center">Hạng</th>
+                <th class="py-3 px-3">Họ và Tên</th>
+                <th class="py-3 px-3">Lớp</th>
+                <th class="py-3 px-3">MSSV</th>
+                <th class="py-3 px-3 text-center">Đúng</th>
+                <th class="py-3 px-3 text-center">Điểm</th>
+                <th class="py-3 px-3 text-center">Thời gian</th>
+                <th class="py-3 px-3">Ngày nộp</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardTbody" class="divide-y divide-slate-800/60"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="border-t border-slate-800 py-4 text-center text-xs text-slate-500 mt-auto">
+    Tiếng Anh Chuyên Ngành Tin Học - Unit 1: Computers Today · Lưu trữ cục bộ localStorage
+  </footer>
+
+  <!-- JAVASCRIPT GAME LOGIC -->
+  <script>
+    // 10 Core Questions
+    const QUESTIONS = [
+      {
+        id: 1,
+        question: "The CPU is a chip which acts as the ... of a computer.",
+        vietnameseMeaning: "CPU là một vi mạch đóng vai trò như ... của máy tính.",
+        category: "CPU & Bộ vi xử lý",
+        options: ["memo", "keyboard", "brain", "hand"],
+        correctAnswer: "brain",
+        explanation: "CPU (Central Processing Unit) là bộ xử lý trung tâm, được ví như 'bộ não' (brain) của máy tính.",
+        grammarNote: "'act as' = đóng vai trò như là."
+      },
+      {
+        id: 2,
+        question: "Peripherals are often divided ... three categories: input, output and storage devices.",
+        vietnameseMeaning: "Các thiết bị ngoại vi thường được chia ... ba nhóm: thiết bị nhập, xuất và lưu trữ.",
+        category: "Thiết bị ngoại vi (Peripherals)",
+        options: ["on", "in", "into", "by"],
+        correctAnswer: "into",
+        explanation: "Cụm cố định: 'divide into' mang nghĩa phân chia thành các phần nhỏ hơn.",
+        grammarNote: "Divide something INTO something."
+      },
+      {
+        id: 3,
+        question: "RAM ... for random access memory.",
+        vietnameseMeaning: "RAM ... cho random access memory (bộ nhớ truy xuất ngẫu nhiên).",
+        category: "Bộ nhớ & Lưu trữ (Memory)",
+        options: ["stands", "stands for", "comes out from", "finds"],
+        correctAnswer: "stands",
+        explanation: "Đề bài đã có sẵn từ 'for' ở phía sau. Do đó chỉ cần động từ 'stands' chia theo chủ ngữ số ít RAM để tạo thành cụm 'stands for'.",
+        grammarNote: "'stand for' = viết tắt của."
+      },
+      {
+        id: 4,
+        question: "A ... is an output device which prints out text or graphics on paper.",
+        vietnameseMeaning: "Một ... là một thiết bị xuất dùng để in văn bản hoặc hình ảnh đồ họa lên giấy.",
+        category: "Thiết bị ngoại vi (Peripherals)",
+        options: ["mouse", "keyboard", "disk drive", "printer"],
+        correctAnswer: "printer",
+        explanation: "Printer (máy in) là thiết bị đầu ra (output device) dùng để in văn bản và hình ảnh ra giấy.",
+        grammarNote: "'which prints out' là mệnh đề quan hệ chỉ vật."
+      },
+      {
+        id: 5,
+        question: "The 'heart' of the processor which performs many different operations is ...",
+        vietnameseMeaning: "'Trái tim' của bộ vi xử lý thực hiện nhiều phép toán khác nhau là ...",
+        category: "CPU & Bộ vi xử lý",
+        options: ["Arithmetic and logic unit", "Motherboard", "Central Unit", "Memory"],
+        correctAnswer: "Arithmetic and logic unit",
+        explanation: "ALU (Arithmetic and Logic Unit) thực hiện các phép toán số học (+, -, *, /) và các phép toán logic so sánh.",
+        grammarNote: "'operations' là các thao tác/phép tính xử lý."
+      },
+      {
+        id: 6,
+        question: "What is the abbreviation for \\"binary digit\\"?",
+        vietnameseMeaning: "Từ viết tắt của \\"binary digit\\" (chữ số nhị phân) là gì?",
+        category: "Số nhị phân & Dữ liệu",
+        options: ["BID", "BD", "BIIT", "BIT"],
+        correctAnswer: "BIT",
+        explanation: "BIT là từ ghép của BInary digiT (chữ số nhị phân 0 hoặc 1).",
+        grammarNote: "'abbreviation' nghĩa là từ viết tắt."
+      },
+      {
+        id: 7,
+        question: "Bits are grouped into eight-digit codes that typically represent characters. Eight bits together are called a ...",
+        vietnameseMeaning: "Các bit được nhóm lại thành mã 8 chữ số. Tám bit đi cùng nhau được gọi là một ...",
+        category: "Số nhị phân & Dữ liệu",
+        options: ["kilobyte", "megabyte", "gigabyte", "byte"],
+        correctAnswer: "byte",
+        explanation: "1 Byte = 8 bits. Một nhóm 8 bit được gọi là một Byte.",
+        grammarNote: "Eight bits together are called a byte."
+      },
+      {
+        id: 8,
+        question: "We store data and program permanently in ...",
+        vietnameseMeaning: "Chúng ta lưu trữ dữ liệu và chương trình một cách lâu dài trong ...",
+        category: "Bộ nhớ & Lưu trữ (Memory)",
+        options: ["Hard disk, floppy disk", "Hard disk, RAM", "RAM, ROM", "Floppy disk, RAM"],
+        correctAnswer: "Hard disk, floppy disk",
+        explanation: "Lưu trữ lâu dài vĩnh viễn (non-volatile) trong đĩa cứng (Hard disk), đĩa mềm (Floppy disk). RAM bị mất dữ liệu khi mất điện.",
+        grammarNote: "'permanently' = vĩnh viễn, lâu dài."
+      },
+      {
+        id: 9,
+        question: "CPU consists of three main parts?",
+        vietnameseMeaning: "CPU bao gồm ba bộ phận chính nào?",
+        category: "CPU & Bộ vi xử lý",
+        options: ["CU, ALU and ROM", "CU, ALU and ACU", "CU, ALU and Registers", "CU, ALU and Register"],
+        correctAnswer: "CU, ALU and Registers",
+        explanation: "3 bộ phận cấu thành CPU là: Control Unit (CU), Arithmetic Logic Unit (ALU) và Registers (các thanh ghi, số nhiều).",
+        grammarNote: "'consist of' = bao gồm."
+      },
+      {
+        id: 10,
+        question: "Main memory is also called?",
+        vietnameseMeaning: "Bộ nhớ chính còn được gọi là gì?",
+        category: "Bộ nhớ & Lưu trữ (Memory)",
+        options: ["External memory", "RAM memory", "Internal memory", "ROM memory"],
+        correctAnswer: "Internal memory",
+        explanation: "Main memory (bộ nhớ chính) còn có tên gọi là Internal memory (bộ nhớ trong).",
+        grammarNote: "'also called' = cũng được gọi là."
+      }
+    ];
+
+    // State Variables
+    let currentStudent = null;
+    let currentQIndex = 0;
+    let userAnswers = {};
+    let isCurrentAnswered = false;
+    let streak = 0;
+    let timerInterval = null;
+    let secondsElapsed = 0;
+    let soundEnabled = true;
+
+    // Web Audio Synthesizer
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      document.getElementById('soundToggleBtn').textContent = soundEnabled ? '🔊' : '🔇';
+    }
+
+    function playTone(freq, type, duration, delay = 0) {
+      if (!soundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        setTimeout(() => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, ctx.currentTime);
+          gain.gain.setValueAtTime(0.12, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + duration);
+        }, delay);
+      } catch(e){}
+    }
+
+    function playCorrectSound() {
+      playTone(660, 'sine', 0.25, 0);
+      playTone(880, 'sine', 0.35, 100);
+    }
+
+    function playWrongSound() {
+      playTone(160, 'sawtooth', 0.25, 0);
+    }
+
+    function playVictorySound() {
+      [523, 659, 784, 1046].forEach((f, idx) => playTone(f, 'triangle', 0.4, idx * 120));
+    }
+
+    // Navigation Screens
+    function showScreen(screen) {
+      ['loginScreen', 'quizScreen', 'resultScreen', 'leaderboardScreen'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      if (screen === 'login') {
+        document.getElementById('loginScreen').classList.remove('hidden');
+        checkResumeProgress();
+      } else if (screen === 'quiz') {
+        document.getElementById('quizScreen').classList.remove('hidden');
+      } else if (screen === 'result') {
+        document.getElementById('resultScreen').classList.remove('hidden');
+      } else if (screen === 'leaderboard') {
+        document.getElementById('leaderboardScreen').classList.remove('hidden');
+        renderLeaderboard();
+      }
+    }
+
+    // Init Page
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedStudent = localStorage.getItem('UNIT1_STUDENT_INFO');
+      if (savedStudent) {
+        try {
+          const parsed = JSON.parse(savedStudent);
+          document.getElementById('inputFullName').value = parsed.fullName || '';
+          document.getElementById('inputClass').value = parsed.studentClass || '';
+          document.getElementById('inputId').value = parsed.studentId || '';
+        } catch(e){}
+      }
+      checkResumeProgress();
+    });
+
+    function checkResumeProgress() {
+      const saved = localStorage.getItem('UNIT1_QUIZ_IN_PROGRESS');
+      if (saved) {
+        try {
+          const prog = JSON.parse(saved);
+          if (prog && prog.answers && Object.keys(prog.answers).length > 0) {
+            document.getElementById('resumeBox').classList.remove('hidden');
+            document.getElementById('resumeText').textContent = \`Sinh viên: \${prog.student.fullName} (\${prog.student.studentId}) · Đã làm \${Object.keys(prog.answers).length}/10 câu.\`;
+          }
+        } catch(e){}
+      }
+    }
+
+    function discardProgress() {
+      localStorage.removeItem('UNIT1_QUIZ_IN_PROGRESS');
+      document.getElementById('resumeBox').classList.add('hidden');
+    }
+
+    function resumeQuiz() {
+      const saved = localStorage.getItem('UNIT1_QUIZ_IN_PROGRESS');
+      if (!saved) return;
+      const prog = JSON.parse(saved);
+      currentStudent = prog.student;
+      currentQIndex = prog.currentIndex || 0;
+      userAnswers = prog.answers || {};
+      secondsElapsed = prog.timeSpentSeconds || 0;
+      startQuizSession();
+    }
+
+    function handleStartQuiz(e) {
+      e.preventDefault();
+      const fullName = document.getElementById('inputFullName').value.trim();
+      const studentClass = document.getElementById('inputClass').value.trim();
+      const studentId = document.getElementById('inputId').value.trim().toUpperCase();
+
+      if (!fullName || !studentClass || !studentId) {
+        const err = document.getElementById('loginError');
+        err.textContent = 'Vui lòng điền đầy đủ tất cả các trường thông tin!';
+        err.classList.remove('hidden');
+        return;
+      }
+
+      currentStudent = { fullName, studentClass, studentId };
+      localStorage.setItem('UNIT1_STUDENT_INFO', JSON.stringify(currentStudent));
+      currentQIndex = 0;
+      userAnswers = {};
+      secondsElapsed = 0;
+      streak = 0;
+      startQuizSession();
+    }
+
+    function startQuizSession() {
+      showScreen('quiz');
+      document.getElementById('quizStudentName').textContent = currentStudent.fullName;
+      document.getElementById('quizStudentInfo').textContent = \`(\${currentStudent.studentId} - \${currentStudent.studentClass})\`;
+
+      // Start timer
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+        const secs = (secondsElapsed % 60).toString().padStart(2, '0');
+        document.getElementById('timerText').textContent = \`\${mins}:\${secs}\`;
+        saveProgress();
+      }, 1000);
+
+      renderCurrentQuestion();
+    }
+
+    function saveProgress() {
+      if (!currentStudent) return;
+      const prog = {
+        student: currentStudent,
+        currentIndex: currentQIndex,
+        answers: userAnswers,
+        timeSpentSeconds: secondsElapsed
+      };
+      localStorage.setItem('UNIT1_QUIZ_IN_PROGRESS', JSON.stringify(prog));
+    }
+
+    function renderCurrentQuestion() {
+      const q = QUESTIONS[currentQIndex];
+      isCurrentAnswered = userAnswers[q.id] !== undefined;
+
+      document.getElementById('currentQuestionNum').textContent = currentQIndex + 1;
+      document.getElementById('questionCategory').textContent = q.category;
+      document.getElementById('questionText').textContent = q.question;
+      
+      const transBox = document.getElementById('translationBox');
+      transBox.textContent = q.vietnameseMeaning;
+      transBox.classList.add('hidden');
+      document.getElementById('transBtnText').textContent = 'Xem dịch nghĩa';
+
+      const progressPct = Math.round(((currentQIndex + 1) / QUESTIONS.length) * 100);
+      document.getElementById('progressPercent').textContent = \`\${progressPct}%\`;
+      document.getElementById('progressBarFill').style.width = \`\${progressPct}%\`;
+
+      // Live correct count
+      let correct = 0;
+      Object.keys(userAnswers).forEach(qid => {
+        const item = QUESTIONS.find(x => x.id == qid);
+        if (item && item.correctAnswer.toLowerCase() === userAnswers[qid].toLowerCase()) correct++;
+      });
+      document.getElementById('liveScore').textContent = correct;
+
+      // Render options
+      const optContainer = document.getElementById('optionsContainer');
+      optContainer.innerHTML = '';
+
+      q.options.forEach((opt, idx) => {
+        const letter = String.fromCharCode(65 + idx);
+        const btn = document.createElement('button');
+        btn.className = 'p-3.5 rounded-xl border text-left flex items-start gap-3 transition text-sm ' + 
+          (isCurrentAnswered ? 'cursor-default ' : 'cursor-pointer hover:border-cyan-500 hover:bg-slate-800 ');
+
+        const chosen = userAnswers[q.id] === opt;
+        const isRight = opt.toLowerCase() === q.correctAnswer.toLowerCase();
+
+        if (isCurrentAnswered) {
+          if (isRight) {
+            btn.className += 'bg-emerald-950/70 border-emerald-500 text-emerald-200 font-semibold';
+          } else if (chosen && !isRight) {
+            btn.className += 'bg-rose-950/70 border-rose-500 text-rose-200';
+          } else {
+            btn.className += 'bg-slate-950/40 border-slate-800 text-slate-500 opacity-60';
+          }
+        } else {
+          btn.className += 'bg-slate-950 border-slate-800 text-slate-200';
+        }
+
+        btn.innerHTML = \`<span class="w-6 h-6 rounded flex items-center justify-center font-bold text-xs shrink-0 \${isCurrentAnswered && isRight ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-400'}">\${letter}</span><span class="flex-1 pt-0.5">\${opt}</span>\`;
+
+        if (!isCurrentAnswered) {
+          btn.onclick = () => selectOption(opt);
+        }
+        optContainer.appendChild(btn);
+      });
+
+      // Feedback
+      const feedback = document.getElementById('feedbackBox');
+      const nextBtn = document.getElementById('nextBtn');
+
+      if (isCurrentAnswered) {
+        const studentAns = userAnswers[q.id];
+        const isCorrect = studentAns.toLowerCase() === q.correctAnswer.toLowerCase();
+        feedback.className = 'mt-5 p-4 rounded-xl border text-xs sm:text-sm ' + (isCorrect ? 'bg-emerald-950/30 border-emerald-500/40 text-emerald-100' : 'bg-rose-950/30 border-rose-500/40 text-rose-100');
+        feedback.innerHTML = \`
+          <div class="font-bold mb-1">\${isCorrect ? '✅ Chính xác! Tuyệt vời!' : '❌ Chưa đúng! Đáp án chính xác là: <strong class="underline">' + q.correctAnswer + '</strong>'}</div>
+          <div class="text-slate-300 leading-relaxed mb-1">\${q.explanation}</div>
+          \${q.grammarNote ? '<div class="text-amber-300/90 italic text-[11px]">💡 ' + q.grammarNote + '</div>' : ''}
+        \`;
+        feedback.classList.remove('hidden');
+        nextBtn.classList.remove('hidden');
+        nextBtn.textContent = currentQIndex < QUESTIONS.length - 1 ? 'Câu Tiếp Theo →' : 'Nộp Bài & Xem Điểm';
+      } else {
+        feedback.classList.add('hidden');
+        nextBtn.classList.add('hidden');
+      }
+    }
+
+    function selectOption(opt) {
+      if (isCurrentAnswered) return;
+      const q = QUESTIONS[currentQIndex];
+      userAnswers[q.id] = opt;
+      const isRight = opt.toLowerCase() === q.correctAnswer.toLowerCase();
+
+      if (isRight) {
+        streak++;
+        playCorrectSound();
+      } else {
+        streak = 0;
+        playWrongSound();
+      }
+
+      const streakBox = document.getElementById('streakBox');
+      if (streak > 1) {
+        streakBox.classList.remove('hidden');
+        document.getElementById('streakCount').textContent = streak;
+      } else {
+        streakBox.classList.add('hidden');
+      }
+
+      saveProgress();
+      renderCurrentQuestion();
+    }
+
+    function toggleTranslation() {
+      const box = document.getElementById('translationBox');
+      const btn = document.getElementById('transBtnText');
+      if (box.classList.contains('hidden')) {
+        box.classList.remove('hidden');
+        btn.textContent = 'Ẩn dịch nghĩa';
+      } else {
+        box.classList.add('hidden');
+        btn.textContent = 'Xem dịch nghĩa';
+      }
+    }
+
+    function handleNextQuestion() {
+      if (currentQIndex < QUESTIONS.length - 1) {
+        currentQIndex++;
+        renderCurrentQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function finishQuiz() {
+      if (timerInterval) clearInterval(timerInterval);
+      localStorage.removeItem('UNIT1_QUIZ_IN_PROGRESS');
+
+      // Calculate score
+      let correct = 0;
+      QUESTIONS.forEach(q => {
+        if (userAnswers[q.id] && userAnswers[q.id].toLowerCase() === q.correctAnswer.toLowerCase()) {
+          correct++;
+        }
+      });
+
+      const score = (correct / QUESTIONS.length) * 10;
+      const pct = Math.round((correct / QUESTIONS.length) * 100);
+
+      // Badges
+      const badges = [];
+      if (score === 10) badges.push('Điểm 10 Tuyệt Đối 🎯');
+      if (secondsElapsed <= 90 && score >= 7) badges.push('Tốc Độ Ánh Sáng ⚡');
+      if (score >= 8) badges.push('Bậc Thầy Phần Cứng 🏆');
+      if (badges.length === 0) badges.push('Chiến Binh Chăm Chỉ 🏅');
+
+      const record = {
+        id: Date.now().toString(),
+        student: currentStudent,
+        score: score,
+        correctCount: correct,
+        totalQuestions: QUESTIONS.length,
+        percentage: pct,
+        timeSpentSeconds: secondsElapsed,
+        completedAt: new Date().toLocaleString('vi-VN'),
+        answers: userAnswers,
+        badges: badges
+      };
+
+      // Save to localStorage leaderboard
+      const existing = JSON.parse(localStorage.getItem('UNIT1_LEADERBOARD_V1') || '[]');
+      existing.unshift(record);
+      localStorage.setItem('UNIT1_LEADERBOARD_V1', JSON.stringify(existing));
+
+      // Display results
+      document.getElementById('resFullName').textContent = currentStudent.fullName;
+      document.getElementById('resClass').textContent = currentStudent.studentClass;
+      document.getElementById('resId').textContent = currentStudent.studentId;
+      document.getElementById('resTime').textContent = \`\${secondsElapsed}s (\${Math.floor(secondsElapsed/60)}p \${secondsElapsed%60}s)\`;
+      document.getElementById('resScore').textContent = score.toFixed(1);
+      document.getElementById('resCount').textContent = \`Đúng \${correct}/\${QUESTIONS.length} câu (\${pct}%)\`;
+
+      const rankEl = document.getElementById('resRank');
+      const rankDesc = document.getElementById('resRankDesc');
+      if (score >= 9) {
+        rankEl.textContent = 'Xuất Sắc';
+        rankEl.className = 'text-2xl sm:text-3xl font-black text-emerald-400 my-1';
+        rankDesc.textContent = 'Nắm vững toàn bộ kiến thức chuyên ngành Unit 1!';
+      } else if (score >= 8) {
+        rankEl.textContent = 'Giỏi';
+        rankEl.className = 'text-2xl sm:text-3xl font-black text-cyan-400 my-1';
+        rankDesc.textContent = 'Nắm rất tốt các khái niệm CPU, ALU và bộ nhớ.';
+      } else if (score >= 6.5) {
+        rankEl.textContent = 'Khá';
+        rankEl.className = 'text-2xl sm:text-3xl font-black text-blue-400 my-1';
+        rankDesc.textContent = 'Đạt yêu cầu môn học, hãy đọc lại câu sai.';
+      } else if (score >= 5) {
+        rankEl.textContent = 'Trung Bình';
+        rankEl.className = 'text-2xl sm:text-3xl font-black text-amber-400 my-1';
+        rankDesc.textContent = 'Đạt điểm chuẩn, cần ôn luyện thêm.';
+      } else {
+        rankEl.textContent = 'Cần Ôn Luyện Lại';
+        rankEl.className = 'text-2xl sm:text-3xl font-black text-rose-400 my-1';
+        rankDesc.textContent = 'Đọc kỹ lời giải bên dưới để cải thiện điểm số.';
+      }
+
+      const badgesContainer = document.getElementById('resBadges');
+      badgesContainer.innerHTML = '';
+      badges.forEach(b => {
+        const sp = document.createElement('span');
+        sp.className = 'px-2 py-1 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold';
+        sp.textContent = b;
+        badgesContainer.appendChild(sp);
+      });
+
+      // Render Review
+      const reviewList = document.getElementById('reviewList');
+      reviewList.innerHTML = '';
+      QUESTIONS.forEach((q, idx) => {
+        const uAns = userAnswers[q.id];
+        const isRight = uAns && uAns.toLowerCase() === q.correctAnswer.toLowerCase();
+        const div = document.createElement('div');
+        div.className = 'p-4 rounded-xl border text-xs ' + (isRight ? 'bg-slate-950 border-emerald-500/30' : 'bg-rose-950/10 border-rose-500/30');
+        div.innerHTML = \`
+          <div class="flex justify-between items-center mb-1">
+            <span class="font-bold text-white">Câu \${idx + 1}: \${q.question}</span>
+            <span class="font-bold \${isRight ? 'text-emerald-400' : 'text-rose-400'}">\${isRight ? 'Đúng (+1.0)' : 'Sai (0)'}</span>
+          </div>
+          <div class="text-slate-400 italic mb-2">Dịch: \${q.vietnameseMeaning}</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+            <div class="p-2 rounded bg-slate-900 border border-slate-800">
+              <span class="text-slate-500 block">Bạn chọn:</span>
+              <span class="font-semibold \${isRight ? 'text-emerald-400' : 'text-rose-400'}">\${uAns || '(Bỏ trống)'}</span>
+            </div>
+            <div class="p-2 rounded bg-emerald-950/20 border border-emerald-500/30">
+              <span class="text-slate-500 block">Đáp án chuẩn:</span>
+              <span class="font-semibold text-emerald-400">\${q.correctAnswer}</span>
+            </div>
+          </div>
+          <div class="p-2.5 rounded bg-slate-900 text-slate-300">
+            <strong>Giải thích:</strong> \${q.explanation}
+          </div>
+        \`;
+        reviewList.appendChild(div);
+      });
+
+      playVictorySound();
+      showScreen('result');
+    }
+
+    function startNewQuiz() {
+      currentQIndex = 0;
+      userAnswers = {};
+      secondsElapsed = 0;
+      streak = 0;
+      startQuizSession();
+    }
+
+    // Leaderboard logic
+    function renderLeaderboard() {
+      const records = JSON.parse(localStorage.getItem('UNIT1_LEADERBOARD_V1') || '[]');
+      const term = (document.getElementById('searchLeaderboard').value || '').toLowerCase();
+      const sortBy = document.getElementById('sortLeaderboard').value;
+
+      const filtered = records.filter(r => {
+        return (
+          r.student.fullName.toLowerCase().includes(term) ||
+          r.student.studentId.toLowerCase().includes(term) ||
+          r.student.studentClass.toLowerCase().includes(term)
+        );
+      });
+
+      filtered.sort((a, b) => {
+        if (sortBy === 'score') {
+          if (b.score !== a.score) return b.score - a.score;
+          return a.timeSpentSeconds - b.timeSpentSeconds;
+        }
+        if (sortBy === 'time') return a.timeSpentSeconds - b.timeSpentSeconds;
+        return new Date(b.completedAt) - new Date(a.completedAt);
+      });
+
+      const tbody = document.getElementById('leaderboardTbody');
+      tbody.innerHTML = '';
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-slate-500">Chưa có bài thi nào được ghi nhận</td></tr>';
+        return;
+      }
+
+      filtered.forEach((r, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-800/40 transition ' + (idx === 0 ? 'bg-amber-500/5' : '');
+        tr.innerHTML = \`
+          <td class="py-3 px-3 text-center font-bold text-slate-400">\${idx === 0 ? '🥇' : (idx === 1 ? '🥈' : (idx === 2 ? '🥉' : '#' + (idx + 1)))}</td>
+          <td class="py-3 px-3 font-semibold text-white">\${r.student.fullName}</td>
+          <td class="py-3 px-3 text-slate-300">\${r.student.studentClass}</td>
+          <td class="py-3 px-3 font-mono text-cyan-300">\${r.student.studentId}</td>
+          <td class="py-3 px-3 text-center text-slate-300 font-semibold">\${r.correctCount}/\${r.totalQuestions}</td>
+          <td class="py-3 px-3 text-center"><span class="px-2 py-0.5 rounded font-bold \${r.score >= 8 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-cyan-500/20 text-cyan-400'}">\${r.score.toFixed(1)}</span></td>
+          <td class="py-3 px-3 text-center text-slate-400">\${r.timeSpentSeconds}s</td>
+          <td class="py-3 px-3 text-slate-500 text-[11px]">\${r.completedAt}</td>
+        \`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function clearAllData() {
+      if (confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử điểm số?')) {
+        localStorage.removeItem('UNIT1_LEADERBOARD_V1');
+        renderLeaderboard();
+      }
+    }
+
+    function exportCSV() {
+      const records = JSON.parse(localStorage.getItem('UNIT1_LEADERBOARD_V1') || '[]');
+      if (records.length === 0) {
+        alert('Chưa có dữ liệu để xuất!');
+        return;
+      }
+      const headers = ['Họ và Tên', 'Lớp', 'MSSV', 'Điểm (Thang 10)', 'Số Câu Đúng', 'Tổng Số Câu', 'Thời Gian (s)', 'Ngày Nộp'];
+      const rows = records.map(r => [
+        \`"\${r.student.fullName}"\`,
+        \`"\${r.student.studentClass}"\`,
+        \`"\${r.student.studentId}"\`,
+        r.score.toFixed(1),
+        r.correctCount,
+        r.totalQuestions,
+        r.timeSpentSeconds,
+        \`"\${r.completedAt}"\`
+      ]);
+      const csv = '\\uFEFF' + [headers.join(','), ...rows.map(x => x.join(','))].join('\\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Diem_Unit1_Computers_Today.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>`;
+}
