@@ -11,6 +11,7 @@ import { QuizView } from './components/QuizView';
 import { ResultView } from './components/ResultView';
 import { LeaderboardView } from './components/LeaderboardView';
 import { SingleFileExportModal } from './components/SingleFileExportModal';
+import { MobileAccessModal } from './components/MobileAccessModal';
 import { sounds } from './utils/sound';
 import {
   Cpu,
@@ -19,6 +20,8 @@ import {
   Volume2,
   VolumeX,
   BookOpen,
+  Smartphone,
+  QrCode,
 } from 'lucide-react';
 
 type ScreenState = 'login' | 'quiz' | 'result' | 'leaderboard';
@@ -28,6 +31,7 @@ export default function App() {
   const [activeStudent, setActiveStudent] = useState<StudentInfo | null>(null);
   const [activeResumeProgress, setActiveResumeProgress] = useState<SavedQuizProgress | undefined>();
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
+  const [isMobileModalOpen, setIsMobileModalOpen] = useState<boolean>(false);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(sounds.isEnabled());
 
   // Result state
@@ -93,7 +97,7 @@ export default function App() {
           </button>
 
           {/* Zone 2: Clean text navigation links */}
-          <nav className="hidden md:flex items-center gap-6 text-xs sm:text-sm font-medium text-slate-400">
+          <nav className="hidden md:flex items-center gap-5 text-xs sm:text-sm font-medium text-slate-400">
             <button
               onClick={() => {
                 sounds.playClick();
@@ -120,17 +124,40 @@ export default function App() {
             <button
               onClick={() => {
                 sounds.playClick();
+                setIsMobileModalOpen(true);
+              }}
+              className="hover:text-cyan-400 text-cyan-300/90 transition-colors cursor-pointer flex items-center gap-1.5"
+            >
+              <Smartphone className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Chơi Trên Điện Thoại</span>
+            </button>
+            <button
+              onClick={() => {
+                sounds.playClick();
                 setIsExportModalOpen(true);
               }}
               className="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5"
             >
-              <FileCode className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Tải File HTML Đơn Lẻ</span>
+              <FileCode className="w-3.5 h-3.5 text-slate-400" />
+              <span>Xuất File HTML</span>
             </button>
           </nav>
 
           {/* Zone 3: 1-2 primary actions */}
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                sounds.playClick();
+                setIsMobileModalOpen(true);
+              }}
+              className="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
+              title="Quét mã QR để mở trên điện thoại"
+            >
+              <Smartphone className="w-3.5 h-3.5 text-cyan-400" />
+              <span className="hidden sm:inline">Quét QR Điện Thoại</span>
+              <span className="sm:hidden">Mã QR</span>
+            </button>
+
             <button
               onClick={toggleSound}
               className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-cyan-400 hover:bg-slate-800 transition-colors cursor-pointer"
@@ -141,17 +168,6 @@ export default function App() {
               ) : (
                 <VolumeX className="w-4 h-4" />
               )}
-            </button>
-
-            <button
-              onClick={() => {
-                sounds.playClick();
-                setIsExportModalOpen(true);
-              }}
-              className="px-3.5 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-semibold transition-all whitespace-nowrap cursor-pointer hidden sm:flex items-center gap-1.5"
-            >
-              <FileCode className="w-3.5 h-3.5" />
-              <span>Xuất HTML</span>
             </button>
           </div>
         </div>
@@ -164,6 +180,7 @@ export default function App() {
             onStartQuiz={handleStartQuiz}
             onOpenLeaderboard={() => setCurrentScreen('leaderboard')}
             onOpenExportModal={() => setIsExportModalOpen(true)}
+            onOpenMobileModal={() => setIsMobileModalOpen(true)}
           />
         )}
 
@@ -232,6 +249,12 @@ export default function App() {
       <SingleFileExportModal
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
+      />
+
+      {/* Modal for Mobile QR Code & Phone Access */}
+      <MobileAccessModal
+        isOpen={isMobileModalOpen}
+        onClose={() => setIsMobileModalOpen(false)}
       />
     </div>
   );

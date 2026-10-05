@@ -1,8 +1,51 @@
 <!doctype html>
 <html lang="vi">
   <head>
+    <script>
+      // Safe guard for environments/sandboxes where window.fetch has only a getter
+      (function() {
+        try {
+          var originalFetch = window.fetch;
+          var desc = Object.getOwnPropertyDescriptor(window, 'fetch');
+          if (!desc || !desc.set) {
+            var _activeFetch = originalFetch;
+            Object.defineProperty(window, 'fetch', {
+              configurable: true,
+              enumerable: true,
+              get: function() {
+                return _activeFetch;
+              },
+              set: function(newFetch) {
+                _activeFetch = newFetch;
+              }
+            });
+          }
+        } catch (e) {
+          try {
+            var proto = Object.getPrototypeOf(window);
+            if (proto) {
+              var pDesc = Object.getOwnPropertyDescriptor(proto, 'fetch');
+              if (pDesc && !pDesc.set) {
+                var _pFetch = proto.fetch;
+                Object.defineProperty(proto, 'fetch', {
+                  configurable: true,
+                  enumerable: true,
+                  get: function() { return _pFetch; },
+                  set: function(v) { _pFetch = v; }
+                });
+              }
+            }
+          } catch (err) {}
+        }
+      })();
+    </script>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#020617" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Unit 1 Quiz" />
     <title>Unit 1: Computers Today - Đấu Trường Trắc Nghiệm Tin Học</title>
     <meta name="description" content="Ứng dụng web ôn tập trắc nghiệm Tiếng Anh Tin học Unit 1: Computers Today dành cho sinh viên với đăng nhập thông tin, lưu trữ điểm số vào localStorage, bảng xếp hạng và huy hiệu thành tích." />
     <meta property="og:title" content="Unit 1: Computers Today - Đấu Trường Trắc Nghiệm Tin Học" />

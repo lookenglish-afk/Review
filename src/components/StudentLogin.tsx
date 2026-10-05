@@ -1,18 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { StudentInfo, StorageService, SavedQuizProgress } from '../utils/storage';
 import { sounds } from '../utils/sound';
-import { User, Award, BookOpen, Clock, ArrowRight, RotateCcw, ShieldCheck, Cpu } from 'lucide-react';
+import {
+  User,
+  Award,
+  BookOpen,
+  Clock,
+  ArrowRight,
+  RotateCcw,
+  ShieldCheck,
+  Cpu,
+  Smartphone,
+  QrCode,
+} from 'lucide-react';
 
 interface StudentLoginProps {
   onStartQuiz: (student: StudentInfo, resumeProgress?: SavedQuizProgress) => void;
   onOpenLeaderboard: () => void;
   onOpenExportModal: () => void;
+  onOpenMobileModal: () => void;
 }
 
 export const StudentLogin: React.FC<StudentLoginProps> = ({
   onStartQuiz,
   onOpenLeaderboard,
   onOpenExportModal,
+  onOpenMobileModal,
 }) => {
   const [fullName, setFullName] = useState('');
   const [studentClass, setStudentClass] = useState('');
@@ -300,11 +313,33 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
           </div>
 
           {/* Quick Access Card */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <button
+              onClick={onOpenMobileModal}
+              type="button"
+              className="p-4 rounded-xl bg-gradient-to-br from-cyan-950/60 to-slate-900 border border-cyan-500/40 text-left transition-all group cursor-pointer hover:border-cyan-400 sm:col-span-3 flex items-center justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-lg bg-cyan-500/20 text-cyan-300 group-hover:scale-110 transition-transform">
+                  <Smartphone className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span>Mở & Chơi Trên Điện Thoại (Quét QR)</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500 text-slate-950 font-bold">Mới</span>
+                  </div>
+                  <div className="text-[11px] text-cyan-200/80 mt-0.5">
+                    Quét camera hoặc Zalo vào làm bài ngay trên iPhone/Android
+                  </div>
+                </div>
+              </div>
+              <QrCode className="w-5 h-5 text-cyan-400 shrink-0" />
+            </button>
+
             <button
               onClick={onOpenLeaderboard}
               type="button"
-              className="p-4 rounded-xl bg-slate-900/70 hover:bg-slate-800/90 border border-slate-800 text-left transition-all group cursor-pointer"
+              className="p-4 rounded-xl bg-slate-900/70 hover:bg-slate-800/90 border border-slate-800 text-left transition-all group cursor-pointer sm:col-span-1"
             >
               <Award className="w-5 h-5 text-amber-400 mb-2 group-hover:scale-110 transition-transform" />
               <div className="text-xs font-bold text-white">Bảng Xếp Hạng</div>
@@ -314,11 +349,11 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
             <button
               onClick={onOpenExportModal}
               type="button"
-              className="p-4 rounded-xl bg-slate-900/70 hover:bg-slate-800/90 border border-slate-800 text-left transition-all group cursor-pointer"
+              className="p-4 rounded-xl bg-slate-900/70 hover:bg-slate-800/90 border border-slate-800 text-left transition-all group cursor-pointer sm:col-span-2"
             >
               <Clock className="w-5 h-5 text-cyan-400 mb-2 group-hover:scale-110 transition-transform" />
-              <div className="text-xs font-bold text-white">Xuất File HTML</div>
-              <div className="text-[11px] text-slate-400 mt-0.5">Chạy offline độc lập</div>
+              <div className="text-xs font-bold text-white">Xuất File HTML Độc Lập</div>
+              <div className="text-[11px] text-slate-400 mt-0.5">Chạy trên máy tính không cần mạng</div>
             </button>
           </div>
 
